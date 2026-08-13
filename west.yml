@@ -1,0 +1,13 @@
+manifest:
+  projects:
+    - name: zephyr
+      url: https://github.com/antmicro/zephyr.git
+      revision: hdmi-usb-combined
+      import:
+        name-allowlist:
+          - cmsis_6
+          - hal_stm32
+    - name: grvl
+      path: modules/grvl
+      url: https://github.com/antmicro/grvl.git
+      revision: main
