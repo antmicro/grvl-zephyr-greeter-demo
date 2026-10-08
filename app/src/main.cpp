@@ -119,6 +119,16 @@ static void load_images(fs::path &rpath, grvl::Manager &manager)
 	load_image("success", "images/success.png", grvl::Format::ARGB8888);
 }
 
+static void ShutdownClicked(void *sender, const grvl::Event::ArgVector &Args)
+{
+	sys_reboot(SYS_REBOOT_COLD);
+}
+
+static void RebootClicked(void *sender, const grvl::Event::ArgVector &Args)
+{
+	sys_reboot(SYS_REBOOT_COLD);
+}
+
 static void grvl_thread(void *a1, void *a2, void *a3)
 {
 	const device* display = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
@@ -144,6 +154,9 @@ static void grvl_thread(void *a1, void *a2, void *a3)
 
 	load_fonts(romfs_path, *mgr);
 	load_images(romfs_path, *mgr);
+
+	mgr->AddCallbackToContainer("ShutdownClicked", ShutdownClicked);
+	mgr->AddCallbackToContainer("RebootClicked", RebootClicked);
 
 	mgr->BuildFromXML((romfs_path / "gui.xml").string().c_str());
 	mgr->InitializationFinished();
