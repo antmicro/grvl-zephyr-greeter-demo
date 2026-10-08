@@ -69,12 +69,52 @@ static void load_fonts(fs::path &rpath, grvl::Manager &manager)
 {
 	LOG_DBG("Loading fonts");
 
+	auto inter_regular_data = std::make_shared<grvl::TrueTypeData>(
+		(rpath / "fonts/inter-regular.ttf").string().c_str());
+	auto inter_medium_data = std::make_shared<grvl::TrueTypeData>(
+		(rpath / "fonts/inter-medium.ttf").string().c_str());
+	auto geistmono_medium_data = std::make_shared<grvl::TrueTypeData>(
+		(rpath / "fonts/geistmono-medium.ttf").string().c_str());
 	auto geistmono_regular_data = std::make_shared<grvl::TrueTypeData>(
 		(rpath / "fonts/geistmono-regular.ttf").string().c_str());
+	auto inter_regular_12 = new grvl::TrueTypeFont(inter_regular_data, 12);
+	auto inter_regular_14 = new grvl::TrueTypeFont(inter_regular_data, 14);
+	auto inter_regular_16 = new grvl::TrueTypeFont(inter_regular_data, 16);
+	auto inter_regular_20 = new grvl::TrueTypeFont(inter_regular_data, 20);
+	auto inter_regular_24 = new grvl::TrueTypeFont(inter_regular_data, 24);
+	auto inter_medium_20 = new grvl::TrueTypeFont(inter_medium_data, 20);
+	auto geistmono_medium_12 = new grvl::TrueTypeFont(geistmono_medium_data, 12);
 	auto geistmono_regular_12 = new grvl::TrueTypeFont(geistmono_regular_data, 12);
 
-	manager.AddFontToFontContainer("normal", geistmono_regular_12);
+	manager.AddFontToFontContainer("normal", inter_regular_16);
+	manager.AddFontToFontContainer("inter-regular-12", inter_regular_12);
+	manager.AddFontToFontContainer("inter-regular-14", inter_regular_14);
+	manager.AddFontToFontContainer("inter-regular-16", inter_regular_16);
+	manager.AddFontToFontContainer("inter-regular-20", inter_regular_20);
+	manager.AddFontToFontContainer("inter-regular-24", inter_regular_24);
+	manager.AddFontToFontContainer("inter-medium-20", inter_medium_20);
+	manager.AddFontToFontContainer("geistmono-medium-12", geistmono_medium_12);
 	manager.AddFontToFontContainer("geistmono-regular-12", geistmono_regular_12);
+}
+
+static void load_images(fs::path &rpath, grvl::Manager &manager)
+{
+	auto load_image = [&](const char *name, const char *path, grvl::Format format) {
+		manager.AddImageContentToContainer(name,
+			new grvl::ImageContent((rpath / path).c_str(), format));
+	};
+
+	LOG_DBG("Loading images");
+
+	load_image("cursor", "images/cursor.png", grvl::Format::AL88);
+	load_image("next", "images/next.png", grvl::Format::AL88);
+	load_image("avatar", "images/avatar.png", grvl::Format::AL88);
+	load_image("shutdown", "images/shutdown.png", grvl::Format::AL88);
+	load_image("reboot", "images/reboot.png", grvl::Format::AL88);
+	load_image("background", "images/background.png", grvl::Format::AL88);
+	load_image("zephyr", "images/zephyr.png", grvl::Format::ARGB8888);
+	load_image("grvl", "images/grvl.png", grvl::Format::AL88);
+	load_image("success", "images/success.png", grvl::Format::ARGB8888);
 }
 
 static void grvl_thread(void *a1, void *a2, void *a3)
@@ -93,6 +133,7 @@ static void grvl_thread(void *a1, void *a2, void *a3)
 	grvl::JSEngine::SetSourceCodeWorkingDirectory(romfs_path.string());
 
 	load_fonts(romfs_path, *mgr);
+	load_images(romfs_path, *mgr);
 
 	mgr->BuildFromXML((romfs_path / "gui.xml").string().c_str());
 	mgr->InitializationFinished();
