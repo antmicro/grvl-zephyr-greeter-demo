@@ -14,7 +14,7 @@
         <division id="middle" x="191" y="123" width="258" height="200">
             <image id="avatar" contentId="avatar" x="97" y="0" />
             <image id="success_icon" visible="false" contentId="success" x="94" y="0" />
-            <label id="username_label" x="0" y="83" width="258" height="20" text="John Doe" textColor="#FFE9E9E9" alignment="Center" font="inter-medium-20" />
+            <label id="username_label" x="0" y="83" width="258" height="20" text="Example User" textColor="#FFE9E9E9" alignment="Center" font="inter-medium-20" />
             <label id="email_label" x="0" y="106" width="258" height="12" text="email@example.com" textColor="#FFA1A1A1" alignment="Center" font="inter-regular-12" />
             <textInput id="answer" x="0" y="127" width="258" height="38" borderType="box" borderArcRadius="19" textColor="#FFA1A1A1" backgroundColor="#FF1B1B1B" borderColor="#FF2C2C2C" font="inter-regular-14" padding="19" basicText="Enter Password" type="password" onSubmit="PasswordSubmit" />
             <button id="proceed" x="226" y="133" width="26" height="26" borderType="box" borderArcRadius="13" backgroundColor="#FFE9E9E9" align="Center" onClick="EnterClicked" image="next" />
