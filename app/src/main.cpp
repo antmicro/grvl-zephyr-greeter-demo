@@ -27,6 +27,8 @@
 #include <grvl/container/ListView.h>
 #include <grvl/container/ScrollPanel.h>
 
+#include "usb_hid.h"
+
 LOG_MODULE_REGISTER(demo, CONFIG_APP_LOG_LEVEL);
 
 namespace fs = std::filesystem;
@@ -120,6 +122,11 @@ static void load_images(fs::path &rpath, grvl::Manager &manager)
 static void grvl_thread(void *a1, void *a2, void *a3)
 {
 	const device* display = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
+
+	const int usb_err = usb_hid_init();
+	if (usb_err) {
+		LOG_ERR("Failed to initialize USB HID (err: %d)", usb_err);
+	}
 
 	setup_romfs();
 

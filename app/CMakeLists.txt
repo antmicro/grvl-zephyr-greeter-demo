@@ -8,6 +8,7 @@ project(grvl-zephyr-greeter-demo)
 
 target_sources(app PRIVATE
   src/main.cpp
+  src/usb_hid.c
 )
 
 if(CONFIG_SDCARD_IMAGE)
