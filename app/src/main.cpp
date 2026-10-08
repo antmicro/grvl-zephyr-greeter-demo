@@ -122,6 +122,9 @@ static void load_images(fs::path &rpath, grvl::Manager &manager)
 static void grvl_thread(void *a1, void *a2, void *a3)
 {
 	const device* display = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
+	int32_t mouse_x = 0;
+	int32_t mouse_y = 0;
+	bool mouse_pressed = false;
 
 	const int usb_err = usb_hid_init();
 	if (usb_err) {
@@ -146,13 +149,21 @@ static void grvl_thread(void *a1, void *a2, void *a3)
 	mgr->InitializationFinished();
 	mgr->SetActiveScreen("start", 0);
 
+	grvl::Component *cursor = mgr->GetActiveScreen()->GetElement("cursor");
+
 	LOG_INF("Ready to draw");
 
 	while (true) {
 		k_timer_start(&refresh_rate_timer, K_MSEC(DIV_ROUND_CLOSEST(1000, TARGET_FRAMERATE)), K_NO_WAIT);
 
+		usb_hid_mouse_state(&mouse_x, &mouse_y, &mouse_pressed);
+		cursor->SetX(mouse_x);
+		cursor->SetY(mouse_y);
+
 		app.Render();
 		app.Swap();
+
+		mgr->ProcessTouchPoint(mouse_pressed, mouse_x, mouse_y);
 
 		k_timer_status_sync(&refresh_rate_timer);
 	}
