@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <cstdlib>
 #include <ctime>
 #include <filesystem>
@@ -28,6 +29,7 @@
 #include <grvl/container/ScrollPanel.h>
 
 #include "usb_hid.h"
+#include "key_code_to_char.h"
 
 LOG_MODULE_REGISTER(demo, CONFIG_APP_LOG_LEVEL);
 
@@ -129,12 +131,60 @@ static void RebootClicked(void *sender, const grvl::Event::ArgVector &Args)
 	sys_reboot(SYS_REBOOT_COLD);
 }
 
+static void handle_key_event(uint16_t key_code, bool key_pressed)
+{
+	static bool lshift_pressed = false;
+	static bool rshift_pressed = false;
+
+	auto mgr = &grvl::Manager::GetInstance();
+	grvl::TextInput *text_input = &dynamic_cast<grvl::TextInput&>(
+		*mgr->GetActiveScreen()->GetElement("answer"));
+
+	if (key_pressed) {
+		switch (key_code) {
+		case INPUT_KEY_LEFTSHIFT:
+			lshift_pressed = true;
+			break;
+		case INPUT_KEY_RIGHTSHIFT:
+			rshift_pressed = true;
+			break;
+		case INPUT_KEY_ENTER:
+			text_input->Submit();
+			break;
+		case INPUT_KEY_BACKSPACE:
+			text_input->RemoveLastCharacter();
+			break;
+		default:
+			char c = key_code_to_char(key_code);
+			if (lshift_pressed || rshift_pressed) {
+				c = toupper(c);
+			}
+			const char c_str[2] = { c, '\0' };
+			text_input->Append(c_str);
+			break;
+		}
+	} else {
+		lshift_pressed &= (key_code != INPUT_KEY_LEFTSHIFT);
+		rshift_pressed &= (key_code != INPUT_KEY_RIGHTSHIFT);
+	}
+}
+
+static void EnterClicked(void *sender, const grvl::Event::ArgVector &Args) {
+	auto mgr = &grvl::Manager::GetInstance();
+	grvl::TextInput *text_input = &dynamic_cast<grvl::TextInput&>(
+		*mgr->GetActiveScreen()->GetElement("answer"));
+
+	text_input->Submit();
+}
+
 static void grvl_thread(void *a1, void *a2, void *a3)
 {
 	const device* display = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
 	int32_t mouse_x = 0;
 	int32_t mouse_y = 0;
 	bool mouse_pressed = false;
+	uint16_t key_code = 0;
+	bool key_pressed = false;
 
 	const int usb_err = usb_hid_init();
 	if (usb_err) {
@@ -157,6 +207,7 @@ static void grvl_thread(void *a1, void *a2, void *a3)
 
 	mgr->AddCallbackToContainer("ShutdownClicked", ShutdownClicked);
 	mgr->AddCallbackToContainer("RebootClicked", RebootClicked);
+	mgr->AddCallbackToContainer("EnterClicked", EnterClicked);
 
 	mgr->BuildFromXML((romfs_path / "gui.xml").string().c_str());
 	mgr->InitializationFinished();
@@ -175,6 +226,10 @@ static void grvl_thread(void *a1, void *a2, void *a3)
 		k_timer_start(&refresh_rate_timer, K_MSEC(DIV_ROUND_CLOSEST(1000, TARGET_FRAMERATE)), K_NO_WAIT);
 
 		usb_hid_mouse_state(&mouse_x, &mouse_y, &mouse_pressed);
+
+		while (usb_hid_keyboard_pop_event(&key_code, &key_pressed)) {
+			handle_key_event(key_code, key_pressed);
+		}
 		cursor->SetX(mouse_x);
 		cursor->SetY(mouse_y);
 
