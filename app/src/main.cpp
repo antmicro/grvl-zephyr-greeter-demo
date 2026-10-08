@@ -149,6 +149,11 @@ static void grvl_thread(void *a1, void *a2, void *a3)
 	mgr->InitializationFinished();
 	mgr->SetActiveScreen("start", 0);
 
+	grvl::Label *version_label = &dynamic_cast<grvl::Label&>(
+		*mgr->GetActiveScreen()->GetElement("version"));
+
+	version_label->SetText("ZEPHYR V" KERNEL_VERSION_STRING);
+
 	grvl::Component *cursor = mgr->GetActiveScreen()->GetElement("cursor");
 
 	LOG_INF("Ready to draw");
