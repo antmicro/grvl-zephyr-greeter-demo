@@ -27,7 +27,7 @@
 #include <grvl/container/ListView.h>
 #include <grvl/container/ScrollPanel.h>
 
-LOG_MODULE_REGISTER(hello_world, CONFIG_APP_LOG_LEVEL);
+LOG_MODULE_REGISTER(demo, CONFIG_APP_LOG_LEVEL);
 
 namespace fs = std::filesystem;
 
