@@ -4,7 +4,7 @@ Copyright (c) 2026 Antmicro
 
 This repository includes an interactive greeter login screen demo using [Graphics Rendering Visual Library](https://github.com/antmicro/grvl) and [Zephyr RTOS](https://zephyrproject.org).
 
-![Monitor picture](images/interface-photo.jpg)
+https://github.com/user-attachments/assets/766d66a7-f738-4de1-b8f7-5ff7a64d5537
 
 The correct password is stored in `app/romfs/callbacks.js` in the `CORRECT_PASSWORD` constant.
 By default it is `Password`.
